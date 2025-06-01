@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import { IPacket, IPacketTagInfo, LengthTypeEnum, PacketTypeEnum } from '../../types.js';
 import { TBlob } from '../TBlob.js';
 import { PacketTagInfo } from './PacketTagInfo.js';
-import { readUInt8, readUInt16BE, readUInt32BE, sliceUint8Array } from '../../utils/parserUtils.js';
+import { readUInt8, readUInt16BE, readUInt32BE, sliceUint8Array, bufferToHexString } from '../../utils/parserUtils.js';
 
 // Import new packet data parsers
 import { PubKeyPacketData } from './PubKeyPacketData.js';
@@ -158,7 +158,7 @@ export class BasePacket extends TBlob implements IPacket {
     public toJSON() {
         let specificDataJSON;
         if (this.packetSpecificData instanceof Uint8Array) {
-            specificDataJSON = `Raw Data (${this.packetSpecificData.length} bytes): ${Buffer.from(this.packetSpecificData.slice(0, Math.min(32, this.packetSpecificData.length))).toString('hex')}...`;
+            specificDataJSON = `Raw Data (${this.packetSpecificData.length} bytes): ${bufferToHexString(this.packetSpecificData.slice(0, Math.min(32, this.packetSpecificData.length)))}...`;
         } else if (typeof (this.packetSpecificData as any)?.toJSON === 'function') {
             specificDataJSON = (this.packetSpecificData as any).toJSON();
         } else {

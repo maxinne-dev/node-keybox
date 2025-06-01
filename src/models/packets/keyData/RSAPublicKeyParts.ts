@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { IRSAPublicKeyParts } from '../../../types.js';
 import { TBlob } from '../../TBlob.js';
-import { readUInt16BE, sliceUint8Array } from '../../../utils/parserUtils.js';
+import { readUInt16BE, sliceUint8Array, bufferToHexString } from '../../../utils/parserUtils.js';
 
 // RSA public key parts (modulus n, exponent e) are stored as MPIs.
 // An MPI consists of a 2-octet length field (number of bits) followed by the number itself.
@@ -43,8 +43,8 @@ export class RSAPublicKeyParts extends TBlob implements IRSAPublicKeyParts {
 
     public toJSON() {
         return {
-            modulusN_hex: Buffer.from(this.modulusN).toString('hex'),
-            publicExponentE_hex: Buffer.from(this.publicExponentE).toString('hex'),
+            modulusN_hex: bufferToHexString(this.modulusN),
+            publicExponentE_hex: bufferToHexString(this.publicExponentE),
             bitLengthModN: this.bitLengthModN,
             bitLengthExpE: this.bitLengthExpE,
             totalLength: this.totalLength,

@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { IEd448SignatureParts } from '../../../types.js';
 import { TBlob } from '../../TBlob.js';
-import { sliceUint8Array } from '../../../utils/parserUtils.js';
+import { sliceUint8Array, bufferToHexString } from '../../../utils/parserUtils.js';
 
 // RFC 9580 Section 5.2.3.5
 export class Ed448SignatureParts extends TBlob implements IEd448SignatureParts {
@@ -25,7 +25,7 @@ export class Ed448SignatureParts extends TBlob implements IEd448SignatureParts {
 
     public toJSON() {
         return {
-            nativeSignature_hex: Buffer.from(this.nativeSignature).toString('hex'),
+            nativeSignature_hex: bufferToHexString(this.nativeSignature),
             totalLength: this.totalLength,
         };
     }

@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import { ISEIPDData, ISEIPDDataV1, ISEIPDDataV2 } from '../../types.js';
 import { TBlob } from '../TBlob.js';
 import { SEIPD_VERSION_1, SEIPD_VERSION_2, AEAD_AUTH_TAG_LENGTH, SymmetricKeyAlgorithm as SKAlgorithmEnum, AEADAlgorithm as AEADAlgorithmEnum } from '../../constants.js';
-import { readUInt8, sliceUint8Array } from '../../utils/parserUtils.js';
+import { readUInt8, sliceUint8Array, bufferToHexString } from '../../utils/parserUtils.js';
 
 export class SEIPDData extends TBlob implements ISEIPDData {
     public version: number;
@@ -74,7 +74,7 @@ export class SEIPDData extends TBlob implements ISEIPDData {
                 version: this.version,
                 data: {
                     encryptedDataAndMDC_length: v1Data.encryptedDataAndMDC.length,
-                    encryptedDataAndMDC_hex_preview: Buffer.from(v1Data.encryptedDataAndMDC.slice(0, Math.min(32, v1Data.encryptedDataAndMDC.length))).toString('hex') + (v1Data.encryptedDataAndMDC.length > 32 ? "..." : ""),
+                    encryptedDataAndMDC_hex_preview: bufferToHexString(v1Data.encryptedDataAndMDC.slice(0, Math.min(32, v1Data.encryptedDataAndMDC.length))) + (v1Data.encryptedDataAndMDC.length > 32 ? "..." : ""),
                 }
             };
         } else if (this.version === SEIPD_VERSION_2) {
@@ -88,9 +88,9 @@ export class SEIPDData extends TBlob implements ISEIPDData {
                     aeadAlgorithmId: v2Data.aeadAlgorithm,
                     chunkSizeOctet: v2Data.chunkSizeOctet,
                     chunkSizeActual: (1 << (v2Data.chunkSizeOctet + 6)),
-                    salt_hex: Buffer.from(v2Data.salt).toString('hex'),
+                    salt_hex: bufferToHexString(v2Data.salt),
                     encryptedDataWithChunkTags_length: v2Data.encryptedDataWithChunkTags.length,
-                    finalAuthenticationTag_hex: Buffer.from(v2Data.finalAuthenticationTag).toString('hex'),
+                    finalAuthenticationTag_hex: bufferToHexString(v2Data.finalAuthenticationTag),
                 }
             };
         }

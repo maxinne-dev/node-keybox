@@ -1,5 +1,6 @@
 
 import { Buffer } from 'buffer'; // Ensure buffer is available, especially in browser environments if not polyfilled
+import * as crypto from 'node:crypto';
 
 export function readUInt8(buffer: Uint8Array, offset: number = 0): number {
     return Buffer.from(buffer).readUInt8(offset);
@@ -19,6 +20,10 @@ export function readUInt32BE(buffer: Uint8Array, offset: number = 0): number {
 
 export function bufferToString(buffer: Uint8Array, encoding: BufferEncoding = 'utf8'): string {
     return Buffer.from(buffer).toString(encoding);
+}
+
+export function bufferToHexString(buffer: Uint8Array): string {
+    return Buffer.from(buffer).toString('hex');
 }
 
 export function sliceUint8Array(source: Uint8Array, start: number, end: number): Uint8Array {
@@ -132,4 +137,15 @@ export function parseKdfParameters(
         symmetricAlgorithmId,
         bytesRead: totalBytesReadForKdfStruct,
     };
+}
+
+/**
+ * Calculates the SHA-1 hash of a Uint8Array.
+ * @param data The data to hash.
+ * @returns A Uint8Array containing the SHA-1 hash.
+ */
+export function sha1Hash(data: Uint8Array): Uint8Array {
+    const hash = crypto.createHash('sha1');
+    hash.update(data);
+    return Uint8Array.from(hash.digest());
 }

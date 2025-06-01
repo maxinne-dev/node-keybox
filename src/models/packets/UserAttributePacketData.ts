@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import { IUserAttributePacketData, IUserAttributeSubpacket, IImageAttributeSubpacketData } from '../../types.js';
 import { TBlob } from '../TBlob.js';
 import { UserAttributeSubpacketType as UATSubpacketTypeEnum, ImageEncodingFormat as ImgEncFormatEnum } from '../../constants.js';
-import { readUInt8, readUInt16LE, sliceUint8Array, bufferToString, readUInt32BE } from '../../utils/parserUtils.js';
+import { readUInt8, readUInt16LE, sliceUint8Array, bufferToString, readUInt32BE, bufferToHexString } from '../../utils/parserUtils.js';
 
 
 // --- UserAttributeSubpacket & ImageAttributeSubpacketData ---
@@ -56,7 +56,7 @@ class ImageAttributeSubpacketData extends TBlob implements IImageAttributeSubpac
             imageEncodingFormat: ImgEncFormatEnum[this.imageEncodingFormat] || `Unknown (${this.imageEncodingFormat})`,
             imageEncodingFormatId: this.imageEncodingFormat,
             imageData_length: this.imageData.length,
-            imageData_hex_preview: Buffer.from(this.imageData.slice(0, Math.min(16, this.imageData.length))).toString('hex') + (this.imageData.length > 16 ? "..." : ""),
+            imageData_hex_preview: bufferToHexString(this.imageData.slice(0, Math.min(16, this.imageData.length))) + (this.imageData.length > 16 ? "..." : ""),
         };
     }
 }
@@ -119,7 +119,7 @@ class UserAttributeSubpacket extends TBlob implements IUserAttributeSubpacket {
     toJSON() {
         let parsedDataJSON;
         if (this.parsedData instanceof Uint8Array) {
-            parsedDataJSON = `Raw Data (${this.parsedData.length} bytes): ${Buffer.from(this.parsedData.slice(0, Math.min(16, this.parsedData.length))).toString('hex')}...`;
+            parsedDataJSON = `Raw Data (${this.parsedData.length} bytes): ${bufferToHexString(this.parsedData.slice(0, Math.min(16, this.parsedData.length)))}...`;
         } else if (typeof (this.parsedData as any)?.toJSON === 'function') {
             parsedDataJSON = (this.parsedData as any).toJSON();
         } else {

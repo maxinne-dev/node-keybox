@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { IPaddingPacketData } from '../../types.js';
 import { TBlob } from '../TBlob.js';
-import { sliceUint8Array } from '../../utils/parserUtils.js';
+import { sliceUint8Array, bufferToHexString } from '../../utils/parserUtils.js';
 
 export class PaddingPacketData extends TBlob implements IPaddingPacketData {
     public paddingContent: Uint8Array;
@@ -15,7 +15,7 @@ export class PaddingPacketData extends TBlob implements IPaddingPacketData {
     public toJSON() {
         return {
             paddingContent_length: this.paddingContent.length,
-            paddingContent_hex_preview: Buffer.from(this.paddingContent.slice(0, Math.min(32, this.paddingContent.length))).toString('hex') + (this.paddingContent.length > 32 ? "..." : ""),
+            paddingContent_hex_preview: bufferToHexString(this.paddingContent.slice(0, Math.min(32, this.paddingContent.length))) + (this.paddingContent.length > 32 ? "..." : ""),
         };
     }
 }

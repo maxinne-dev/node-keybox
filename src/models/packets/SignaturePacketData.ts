@@ -12,9 +12,8 @@ import { DSASignatureParts } from './signatureData/DSASignatureParts.js';
 import { EdDSALegacySignatureParts } from './signatureData/EdDSALegacySignatureParts.js';
 import { Ed25519SignatureParts } from './signatureData/Ed25519SignatureParts.js';
 import { Ed448SignatureParts } from './signatureData/Ed448SignatureParts.js';
-import { readUInt8, readUInt16BE, readUInt32BE, sliceUint8Array } from '../../utils/parserUtils.js';
-import { PublicKeyAlgorithm, HashAlgorithm as HashAlgorithmEnum, SignatureType as SignatureTypeEnum } from '../../constants.js';
-// TODO: Import HashAlgorithm Salt Sizes from constants.ts if defined, for v6 salt validation.
+import { readUInt8, readUInt16BE, readUInt32BE, sliceUint8Array, bufferToHexString } from '../../utils/parserUtils.js';
+import { PublicKeyAlgorithm, HashAlgorithm as HashAlgorithmEnum, SignatureType as SignatureTypeEnum, V6_SIGNATURE_SALT_SIZES } from '../../constants.js';
 
 export class SignaturePacketData extends TBlob implements ISignaturePacketData {
     public version: number;
@@ -104,8 +103,12 @@ export class SignaturePacketData extends TBlob implements ISignaturePacketData {
 
             if (this.version === 6) {
                 const saltSize = readUInt8(this._getRelativeSubarray(currentRelativeOffset, ++currentRelativeOffset));
-                // RFC 9580 Table 23 lists salt sizes (e.g., SHA256 is 16, SHA512 is 32)
-                // A real implementation should validate saltSize against the expected size for this.hashAlgorithm
+                const expectedSaltSize = V6_SIGNATURE_SALT_SIZES.get(this.hashAlgorithm);
+                if (expectedSaltSize !== undefined && saltSize !== expectedSaltSize) {
+                    console.warn(`SignaturePacketData v6: Salt size ${saltSize} for hash algorithm ${HashAlgorithmEnum[this.hashAlgorithm]} (ID ${this.hashAlgorithm}) does not match expected size ${expectedSaltSize}.`);
+                } else if (expectedSaltSize === undefined) {
+                    console.warn(`SignaturePacketData v6: No expected salt size defined for hash algorithm ${HashAlgorithmEnum[this.hashAlgorithm]} (ID ${this.hashAlgorithm}). Cannot validate salt size ${saltSize}.`);
+                }
                 this.saltV6 = this._getRelativeSubarray(currentRelativeOffset, currentRelativeOffset + saltSize);
                 currentRelativeOffset += saltSize;
             }
@@ -154,7 +157,7 @@ export class SignaturePacketData extends TBlob implements ISignaturePacketData {
     public toJSON() {
         let algoDataJSON;
         if (this.signatureAlgorithmData instanceof Uint8Array) {
-            algoDataJSON = `Raw Signature Algo Data (${this.signatureAlgorithmData.length} bytes): ${Buffer.from(this.signatureAlgorithmData.slice(0,Math.min(16, this.signatureAlgorithmData.length))).toString('hex')}...`;
+            algoDataJSON = `Raw Signature Algo Data (${this.signatureAlgorithmData.length} bytes): ${bufferToHexString(this.signatureAlgorithmData.slice(0,Math.min(16, this.signatureAlgorithmData.length)))}...`;
         } else if (typeof (this.signatureAlgorithmData as any)?.toJSON === 'function') {
             algoDataJSON = (this.signatureAlgorithmData as any).toJSON();
         } else {
@@ -169,7 +172,7 @@ export class SignaturePacketData extends TBlob implements ISignaturePacketData {
             publicKeyAlgorithmId: this.publicKeyAlgorithm,
             hashAlgorithm: HashAlgorithmEnum[this.hashAlgorithm] || `Unknown (${this.hashAlgorithm})`,
             hashAlgorithmId: this.hashAlgorithm,
-            left16BitsSignedHash_hex: Buffer.from(this.left16BitsSignedHash).toString('hex'),
+            left16BitsSignedHash_hex: bufferToHexString(this.left16BitsSignedHash),
             signatureAlgorithmData: algoDataJSON,
         };
 
@@ -178,7 +181,7 @@ export class SignaturePacketData extends TBlob implements ISignaturePacketData {
                 ...base,
                 creationTimeV3: this.creationTimeV3,
                 creationDateV3: this.creationDateV3?.toISOString(),
-                signerKeyIDV3_hex: this.signerKeyIDV3 ? Buffer.from(this.signerKeyIDV3).toString('hex') : undefined,
+                signerKeyIDV3_hex: this.signerKeyIDV3 ? bufferToHexString(this.signerKeyIDV3) : undefined,
             };
         } else { // v4 or v6
             return {
@@ -187,7 +190,7 @@ export class SignaturePacketData extends TBlob implements ISignaturePacketData {
                 hashedSubpackets: this.hashedSubpackets.map(sp => sp.toJSON()),
                 unhashedSubpacketsCount: this.unhashedSubpacketsCount,
                 unhashedSubpackets: this.unhashedSubpackets.map(sp => sp.toJSON()),
-                saltV6_hex: this.saltV6 ? Buffer.from(this.saltV6).toString('hex') : undefined,
+                saltV6_hex: this.saltV6 ? bufferToHexString(this.saltV6) : undefined,
             };
         }
     }

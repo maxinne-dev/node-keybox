@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { ICompressedDataPacketData } from '../../types.js';
 import { TBlob } from '../TBlob.js';
-import { readUInt8, sliceUint8Array } from '../../utils/parserUtils.js';
+import { readUInt8, sliceUint8Array, bufferToHexString } from '../../utils/parserUtils.js';
 import { CompressionAlgorithm as CompressionAlgorithmEnum } from '../../constants.js';
 
 
@@ -28,7 +28,7 @@ export class CompressedDataPacketData extends TBlob implements ICompressedDataPa
             compressionAlgorithm: CompressionAlgorithmEnum[this.compressionAlgorithm] || `Unknown (${this.compressionAlgorithm})`,
             compressionAlgorithmId: this.compressionAlgorithm,
             compressedContent_length: this.compressedContent.length,
-            compressedContent_hex_preview: Buffer.from(this.compressedContent.slice(0, Math.min(32, this.compressedContent.length))).toString('hex') + (this.compressedContent.length > 32 ? "..." : ""),
+            compressedContent_hex_preview: bufferToHexString(this.compressedContent.slice(0, Math.min(32, this.compressedContent.length))) + (this.compressedContent.length > 32 ? "..." : ""),
         };
     }
 }

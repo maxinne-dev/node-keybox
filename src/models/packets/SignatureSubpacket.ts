@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import { ISignatureSubpacket } from '../../types.js';
 import { TBlob } from '../TBlob.js';
 import { SignatureSubpacketType as SigSubpacketTypeEnum } from '../../constants.js';
-import { readUInt8, readUInt32BE, sliceUint8Array } from '../../utils/parserUtils.js';
+import { readUInt8, readUInt32BE, sliceUint8Array, bufferToHexString } from '../../utils/parserUtils.js';
 
 
 export class SignatureSubpacket extends TBlob implements ISignatureSubpacket {
@@ -63,7 +63,7 @@ export class SignatureSubpacket extends TBlob implements ISignatureSubpacket {
             type: SigSubpacketTypeEnum[this.type] || `Unknown (${this.type})`,
             typeId: this.type,
             isCritical: this.isCritical,
-            rawData_hex: Buffer.from(this.rawData).toString('hex'),
+            rawData_hex: bufferToHexString(this.rawData),
         };
     }
 }

@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { IDSAPublicKeyParts } from '../../../types.js';
 import { TBlob } from '../../TBlob.js';
-import { parseMPI } from '../../../utils/parserUtils.js';
+import { parseMPI, bufferToHexString } from '../../../utils/parserUtils.js';
 
 export class DSAPublicKeyParts extends TBlob implements IDSAPublicKeyParts {
     public primeP: Uint8Array;
@@ -41,10 +41,10 @@ export class DSAPublicKeyParts extends TBlob implements IDSAPublicKeyParts {
 
     public toJSON() {
         return {
-            primeP_hex: Buffer.from(this.primeP).toString('hex'),
-            groupOrderQ_hex: Buffer.from(this.groupOrderQ).toString('hex'),
-            groupGeneratorG_hex: Buffer.from(this.groupGeneratorG).toString('hex'),
-            publicKeyY_hex: Buffer.from(this.publicKeyY).toString('hex'),
+            primeP_hex: bufferToHexString(this.primeP),
+            groupOrderQ_hex: bufferToHexString(this.groupOrderQ),
+            groupGeneratorG_hex: bufferToHexString(this.groupGeneratorG),
+            publicKeyY_hex: bufferToHexString(this.publicKeyY),
             totalLength: this.totalLength,
         };
     }

@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { IEd448PublicKeyParts } from '../../../types.js';
 import { TBlob } from '../../TBlob.js';
-import { sliceUint8Array } from '../../../utils/parserUtils.js';
+import { sliceUint8Array, bufferToHexString } from '../../../utils/parserUtils.js';
 
 // RFC 9580 Section 5.5.5.10
 export class Ed448PublicKeyParts extends TBlob implements IEd448PublicKeyParts {
@@ -25,7 +25,7 @@ export class Ed448PublicKeyParts extends TBlob implements IEd448PublicKeyParts {
 
     public toJSON() {
         return {
-            publicKey_hex: Buffer.from(this.publicKey).toString('hex'),
+            publicKey_hex: bufferToHexString(this.publicKey),
             totalLength: this.totalLength,
         };
     }

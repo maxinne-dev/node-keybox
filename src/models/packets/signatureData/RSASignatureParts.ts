@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { IRSASignatureParts } from '../../../types.js';
 import { TBlob } from '../../TBlob.js';
-import { parseMPI } from '../../../utils/parserUtils.js';
+import { parseMPI, bufferToHexString } from '../../../utils/parserUtils.js';
 
 export class RSASignatureParts extends TBlob implements IRSASignatureParts {
     public signatureMPI: Uint8Array; // m^d mod n
@@ -22,7 +22,7 @@ export class RSASignatureParts extends TBlob implements IRSASignatureParts {
 
     public toJSON() {
         return {
-            signatureMPI_hex: Buffer.from(this.signatureMPI).toString('hex'),
+            signatureMPI_hex: bufferToHexString(this.signatureMPI),
             totalLength: this.totalLength,
         };
     }

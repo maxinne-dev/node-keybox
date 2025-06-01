@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { ITrustPacketData } from '../../types.js';
 import { TBlob } from '../TBlob.js';
-import { sliceUint8Array } from '../../utils/parserUtils.js';
+import { sliceUint8Array, bufferToHexString } from '../../utils/parserUtils.js';
 
 export class TrustPacketData extends TBlob implements ITrustPacketData {
     public trustData: Uint8Array;
@@ -16,7 +16,7 @@ export class TrustPacketData extends TBlob implements ITrustPacketData {
 
     public toJSON() {
         return {
-            trustData_hex: Buffer.from(this.trustData).toString('hex'),
+            trustData_hex: bufferToHexString(this.trustData),
             trustData_length: this.trustData.length,
         };
     }

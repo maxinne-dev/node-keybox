@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import { IKeyInfo } from '../types.js';
 import { TBlob } from './TBlob.js';
 import { KEY_INFO_V1_FINGERPRINT_SIZE, KEY_INFO_V2_FINGERPRINT_SIZE, KEY_INFO_V2_KEYGRIP_SIZE } from '../constants.js';
-import { readUInt32BE, readUInt16BE, sliceUint8Array } from '../utils/parserUtils.js';
+import { readUInt32BE, readUInt16BE, sliceUint8Array, bufferToHexString } from '../utils/parserUtils.js';
 
 export class KeyInfo extends TBlob implements IKeyInfo {
     public readonly actualSizeInBlob: number;
@@ -51,22 +51,22 @@ export class KeyInfo extends TBlob implements IKeyInfo {
     public toJSON() {
         const common = {
             actualSizeInBlob: this.actualSizeInBlob,
-            keyFlagsRaw: Buffer.from(this.keyFlagsRaw).toString('hex'),
+            keyFlagsRaw_hex: bufferToHexString(this.keyFlagsRaw),
             keyFlagsParsed: this.keyFlagsParsed,
         };
         if (this._blobVersion === 1) {
             return {
                 ...common,
                 blobVersion: 1 as const,
-                fingerprintV1: this.fingerprintV1 ? Buffer.from(this.fingerprintV1).toString('hex') : undefined,
+                fingerprintV1_hex: this.fingerprintV1 ? bufferToHexString(this.fingerprintV1) : undefined,
                 offsetKeyID: this.offsetKeyID,
             };
         } else {
             return {
                 ...common,
                 blobVersion: 2 as const,
-                fingerprintV2: this.fingerprintV2 ? Buffer.from(this.fingerprintV2).toString('hex') : undefined,
-                keygrip: this.keygrip ? Buffer.from(this.keygrip).toString('hex') : undefined,
+                fingerprintV2_hex: this.fingerprintV2 ? bufferToHexString(this.fingerprintV2) : undefined,
+                keygrip_hex: this.keygrip ? bufferToHexString(this.keygrip) : undefined,
             };
         }
     }

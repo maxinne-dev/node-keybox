@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import { IFirstBlock, TCursor, TRawFirstBlockKeys } from '../types.js';
 import { TBlob } from './TBlob.js';
 import { FIRST_BLOB_STRUCTURE_SIZE, FIRST_BLOB_MAGIC, BLOB_TYPE_FIRST, FIRST_BLOB_VERSION } from '../constants.js';
-import { readUInt32BE, readUInt16BE, readUInt8, bufferToString } from '../utils/parserUtils.js';
+import { readUInt32BE, readUInt16BE, readUInt8, bufferToString, bufferToHexString } from '../utils/parserUtils.js';
 
 type FirstBlockRawData = {
     rawBlobLength: Uint8Array;

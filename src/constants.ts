@@ -74,6 +74,17 @@ export enum HashAlgorithm {
     SHA3_512 = 14,
 }
 
+// V6 Signature Salt Sizes (RFC 9580 - Section 9.5, Table 23)
+export const V6_SIGNATURE_SALT_SIZES: ReadonlyMap<HashAlgorithm, number> = new Map([
+    [HashAlgorithm.SHA256, 16],
+    [HashAlgorithm.SHA384, 24],
+    [HashAlgorithm.SHA512, 32],
+    [HashAlgorithm.SHA224, 16],
+    [HashAlgorithm.SHA3_256, 16],
+    [HashAlgorithm.SHA3_512, 32],
+]);
+
+
 // Symmetric Key Algorithms (RFC 9580 - Section 9.3, Table 21)
 export enum SymmetricKeyAlgorithm {
     PLAINTEXT = 0,

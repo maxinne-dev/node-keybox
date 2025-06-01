@@ -3,6 +3,8 @@ import { Buffer } from 'buffer';
 import { ISignatureExpirationTime } from '../types.js';
 import { TBlob } from './TBlob.js';
 import { SIGNATURE_EXPIRATION_TIME_STRUCTURE_SIZE } from '../constants.js';
+import { bufferToHexString } from '../utils/parserUtils.js';
+
 
 export class SignatureExpirationTime extends TBlob implements ISignatureExpirationTime {
     public readonly structureLength: number = SIGNATURE_EXPIRATION_TIME_STRUCTURE_SIZE;
@@ -26,7 +28,7 @@ export class SignatureExpirationTime extends TBlob implements ISignatureExpirati
 
     public toJSON() {
         return {
-            expirationTimeRaw: Buffer.from(this.expirationTimeRaw).toString('hex'),
+            expirationTimeRaw_hex: bufferToHexString(this.expirationTimeRaw),
             structureLength: this.structureLength,
         };
     }

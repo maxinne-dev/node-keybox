@@ -40,7 +40,7 @@ describe('KeyInfo', () => {
             
             expect(json.blobVersion).toBe(1); // Explicitly check the discriminant
             if (json.blobVersion === 1) {
-                expect(json.fingerprintV1).toBe('0102030405060708090a0b0c0d0e0f1011121314');
+                expect(json.fingerprintV1_hex).toBe('0102030405060708090a0b0c0d0e0f1011121314');
                 expect(json.offsetKeyID).toBe(291);
             } else {
                 expect.fail('Expected blobVersion to be 1 for V1 KeyInfo JSON');
@@ -79,8 +79,8 @@ describe('KeyInfo', () => {
 
             expect(json.blobVersion).toBe(2); // Explicitly check the discriminant
             if (json.blobVersion === 2) {
-                expect(json.fingerprintV2).toBe('0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20');
-                expect(json.keygrip).toBe('aabbccddeeff00112233445566778899aabbccdd'); // Buffer.from(...).toString('hex') lowercases
+                expect(json.fingerprintV2_hex).toBe('0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20');
+                expect(json.keygrip_hex).toBe('aabbccddeeff00112233445566778899aabbccdd'); // Buffer.from(...).toString('hex') lowercases
             } else {
                 expect.fail('Expected blobVersion to be 2 for V2 KeyInfo JSON');
             }

@@ -397,6 +397,7 @@ export interface IKeyboxFile {
         };
         packets: IPacket[]; // Packets from the keyblock/certificate data region
         checksum: Uint8Array; // 20-byte checksum from the end of this blob
+        isChecksumValid?: boolean; // True if checksum matches calculated checksum, false otherwise, undefined if not checked/applicable
     };
     // Potentially more blobs if the file contains them
 }

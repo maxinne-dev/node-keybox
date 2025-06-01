@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import { ILiteralPacketData } from '../../types.js';
 import { TBlob } from '../TBlob.js';
 import { LiteralDataFormat, LITERAL_FORMAT_BINARY_OCTET, LITERAL_FORMAT_TEXT_OCTET, LITERAL_FORMAT_UTF8_OCTET } from '../../constants.js';
-import { readUInt8, readUInt32BE, bufferToString, sliceUint8Array } from '../../utils/parserUtils.js';
+import { readUInt8, readUInt32BE, bufferToString, sliceUint8Array, bufferToHexString } from '../../utils/parserUtils.js';
 
 export class LiteralPacketData extends TBlob implements ILiteralPacketData {
     public format: LiteralDataFormat;
@@ -56,7 +56,7 @@ export class LiteralPacketData extends TBlob implements ILiteralPacketData {
             filename: this.filename,
             timestamp: this.timestamp,
             date: this.date.toISOString(),
-            literalContent_hex_preview: Buffer.from(this.literalContent.slice(0, Math.min(32, this.literalContent.length))).toString('hex') + (this.literalContent.length > 32 ? "..." : ""),
+            literalContent_hex_preview: bufferToHexString(this.literalContent.slice(0, Math.min(32, this.literalContent.length))) + (this.literalContent.length > 32 ? "..." : ""),
             literalContent_length: this.literalContent.length,
         };
     }

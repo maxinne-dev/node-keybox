@@ -1,4 +1,5 @@
 
+
 import { describe, it, expect, vi } from 'vitest';
 import { SignatureExpirationTime } from '../../models/SignatureExpirationTime.js';
 import { SIGNATURE_EXPIRATION_TIME_STRUCTURE_SIZE } from '../../constants.js';
@@ -23,7 +24,7 @@ describe('SignatureExpirationTime', () => {
         const sigExpTime = new SignatureExpirationTime(keyboxData, 0, SIGNATURE_EXPIRATION_TIME_STRUCTURE_SIZE);
         const json = sigExpTime.toJSON();
 
-        expect(json.expirationTimeRaw).toBe(validExpirationHex.toLowerCase());
+        expect(json.expirationTimeRaw_hex).toBe(validExpirationHex.toLowerCase());
         expect(json.structureLength).toBe(SIGNATURE_EXPIRATION_TIME_STRUCTURE_SIZE);
     });
 

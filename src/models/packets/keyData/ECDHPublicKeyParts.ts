@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { IECDHPublicKeyParts, IKdfParameters } from '../../../types.js';
 import { TBlob } from '../../TBlob.js';
-import { parseMPI, parseVariableLengthField, parseKdfParameters } from '../../../utils/parserUtils.js';
+import { parseMPI, parseVariableLengthField, parseKdfParameters, bufferToHexString } from '../../../utils/parserUtils.js';
 
 export class ECDHPublicKeyParts extends TBlob implements IECDHPublicKeyParts {
     public oid: Uint8Array;
@@ -39,8 +39,8 @@ export class ECDHPublicKeyParts extends TBlob implements IECDHPublicKeyParts {
 
     public toJSON() {
         return {
-            oid_hex: Buffer.from(this.oid).toString('hex'),
-            point_mpi_hex: Buffer.from(this.point).toString('hex'),
+            oid_hex: bufferToHexString(this.oid),
+            point_mpi_hex: bufferToHexString(this.point),
             kdfParameters: {
                 hashAlgorithmId: this.kdfParameters.hashAlgorithmId,
                 symmetricAlgorithmId: this.kdfParameters.symmetricAlgorithmId,

@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { IECDSAPublicKeyParts } from '../../../types.js';
 import { TBlob } from '../../TBlob.js';
-import { parseMPI, parseVariableLengthField } from '../../../utils/parserUtils.js';
+import { parseMPI, parseVariableLengthField, bufferToHexString } from '../../../utils/parserUtils.js';
 
 export class ECDSAPublicKeyParts extends TBlob implements IECDSAPublicKeyParts {
     public oid: Uint8Array;
@@ -31,8 +31,8 @@ export class ECDSAPublicKeyParts extends TBlob implements IECDSAPublicKeyParts {
 
     public toJSON() {
         return {
-            oid_hex: Buffer.from(this.oid).toString('hex'),
-            point_mpi_hex: Buffer.from(this.point).toString('hex'),
+            oid_hex: bufferToHexString(this.oid),
+            point_mpi_hex: bufferToHexString(this.point),
             totalLength: this.totalLength,
         };
     }

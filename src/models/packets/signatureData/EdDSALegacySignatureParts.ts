@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { IEdDSALegacySignatureParts } from '../../../types.js';
 import { TBlob } from '../../TBlob.js';
-import { parseMPI } from '../../../utils/parserUtils.js';
+import { parseMPI, bufferToHexString } from '../../../utils/parserUtils.js';
 
 // RFC 9580 Section 5.2.3.3
 export class EdDSALegacySignatureParts extends TBlob implements IEdDSALegacySignatureParts {
@@ -32,8 +32,8 @@ export class EdDSALegacySignatureParts extends TBlob implements IEdDSALegacySign
 
     public toJSON() {
         return {
-            r_mpi_hex: Buffer.from(this.r_mpi).toString('hex'),
-            s_mpi_hex: Buffer.from(this.s_mpi).toString('hex'),
+            r_mpi_hex: bufferToHexString(this.r_mpi),
+            s_mpi_hex: bufferToHexString(this.s_mpi),
             totalLength: this.totalLength,
         };
     }

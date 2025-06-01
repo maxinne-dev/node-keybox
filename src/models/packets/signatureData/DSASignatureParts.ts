@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { IDSASignatureParts } from '../../../types.js';
 import { TBlob } from '../../TBlob.js';
-import { parseMPI } from '../../../utils/parserUtils.js';
+import { parseMPI, bufferToHexString } from '../../../utils/parserUtils.js';
 
 export class DSASignatureParts extends TBlob implements IDSASignatureParts {
     public r: Uint8Array;
@@ -31,8 +31,8 @@ export class DSASignatureParts extends TBlob implements IDSASignatureParts {
 
     public toJSON() {
         return {
-            r_hex: Buffer.from(this.r).toString('hex'),
-            s_hex: Buffer.from(this.s).toString('hex'),
+            r_hex: bufferToHexString(this.r),
+            s_hex: bufferToHexString(this.s),
             totalLength: this.totalLength,
         };
     }

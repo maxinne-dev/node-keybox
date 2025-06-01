@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer';
 import { IEdDSALegacyPublicKeyParts } from '../../../types.js';
 import { TBlob } from '../../TBlob.js';
-import { parseMPI, parseVariableLengthField } from '../../../utils/parserUtils.js';
+import { parseMPI, parseVariableLengthField, bufferToHexString } from '../../../utils/parserUtils.js';
 
 // For EdDSALegacy keys (deprecated), Algo ID 22
 // RFC 9580 Section 5.5.5.5
@@ -33,8 +33,8 @@ export class EdDSALegacyPublicKeyParts extends TBlob implements IEdDSALegacyPubl
 
     public toJSON() {
         return {
-            oid_hex: Buffer.from(this.oid).toString('hex'),
-            point_mpi_hex: Buffer.from(this.point).toString('hex'), // Prefixed native form
+            oid_hex: bufferToHexString(this.oid),
+            point_mpi_hex: bufferToHexString(this.point), // Prefixed native form
             totalLength: this.totalLength,
         };
     }

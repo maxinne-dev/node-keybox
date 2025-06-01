@@ -1,3 +1,4 @@
+
 import { Buffer } from 'buffer';
 import { IPublicKeyPacketData, TPublicKeyAlgorithmData, IRSAPublicKeyParts, IDSAPublicKeyParts, IElgamalPublicKeyParts, IECDSAPublicKeyParts, IEdDSALegacyPublicKeyParts, IECDHPublicKeyParts, IX25519PublicKeyParts, IX448PublicKeyParts, IEd25519PublicKeyParts, IEd448PublicKeyParts } from '../../types.js';
 import { TBlob } from '../TBlob.js';
@@ -12,7 +13,7 @@ import { X25519PublicKeyParts } from './keyData/X25519PublicKeyParts.js';
 import { X448PublicKeyParts } from './keyData/X448PublicKeyParts.js';
 import { Ed25519PublicKeyParts } from './keyData/Ed25519PublicKeyParts.js';
 import { Ed448PublicKeyParts } from './keyData/Ed448PublicKeyParts.js';
-import { readUInt8, readUInt32BE, sliceUint8Array } from '../../utils/parserUtils.js';
+import { readUInt8, readUInt32BE, sliceUint8Array, bufferToHexString } from '../../utils/parserUtils.js';
 
 export class PubKeyPacketData extends TBlob implements IPublicKeyPacketData {
     public keyVersion: number;
@@ -134,7 +135,7 @@ export class PubKeyPacketData extends TBlob implements IPublicKeyPacketData {
     public toJSON() {
         let algoDataJSON;
         if (this.algorithmData instanceof Uint8Array) {
-            algoDataJSON = `Raw Algorithm Data (${this.algorithmData.length} bytes): ${Buffer.from(this.algorithmData.slice(0,Math.min(16,this.algorithmData.length))).toString('hex')}...`;
+            algoDataJSON = `Raw Algorithm Data (${this.algorithmData.length} bytes): ${bufferToHexString(this.algorithmData.slice(0,Math.min(16,this.algorithmData.length)))}...`;
         } else if (typeof (this.algorithmData as any)?.toJSON === 'function') {
             algoDataJSON = (this.algorithmData as any).toJSON();
         } else {
