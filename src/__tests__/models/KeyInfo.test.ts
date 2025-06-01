@@ -37,7 +37,7 @@ describe('KeyInfo', () => {
             keyboxData.set(v1KeyInfoData, 0);
             const keyInfo = new KeyInfo(keyboxData, 0, v1StructSize, 1);
             const json = keyInfo.toJSON();
-
+            
             expect(json.blobVersion).toBe(1); // Explicitly check the discriminant
             if (json.blobVersion === 1) {
                 expect(json.fingerprintV1).toBe('0102030405060708090a0b0c0d0e0f1011121314');

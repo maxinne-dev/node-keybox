@@ -1,4 +1,3 @@
-
 import { Buffer } from 'buffer';
 import { IPublicKeyPacketData, TPublicKeyAlgorithmData, IRSAPublicKeyParts, IDSAPublicKeyParts, IElgamalPublicKeyParts, IECDSAPublicKeyParts, IEdDSALegacyPublicKeyParts, IECDHPublicKeyParts, IX25519PublicKeyParts, IX448PublicKeyParts, IEd25519PublicKeyParts, IEd448PublicKeyParts } from '../../types.js';
 import { TBlob } from '../TBlob.js';
@@ -31,8 +30,6 @@ export class PubKeyPacketData extends TBlob implements IPublicKeyPacketData {
         currentRelativeOffset += 1;
 
         if (this.keyVersion !== 4 && this.keyVersion !== 3 && this.keyVersion !== 5 && this.keyVersion !== 6) { 
-            // Keybox spec mainly refers to v4 keys. GnuPG might produce other versions.
-            // RFC 9580 introduces v6 keys.
             console.warn(`PubKeyPacketData: Parsing PublicKey Packet version ${this.keyVersion}. Support might be limited for non-v4/v6.`);
         }
         
@@ -40,32 +37,26 @@ export class PubKeyPacketData extends TBlob implements IPublicKeyPacketData {
         currentRelativeOffset += 4;
         this.keyCreationDate = new Date(this.keyCreationTimestamp * 1000);
 
-        // For v3 keys, there's a 2-octet "days valid" field here. This parser assumes v4+.
         if (this.keyVersion === 3) {
-            // daysValid = readUInt16BE(this._getRelativeSubarray(currentRelativeOffset, currentRelativeOffset + 2));
             currentRelativeOffset += 2; 
             console.warn(`PubKeyPacketData: Encountered v3 key with validity period. This field is ignored by this parser.`);
         }
         
-        // For v6 keys, there is a 4-octet scalar octet count for the public key material.
-        let publicKeyMaterialLength = dataLength - currentRelativeOffset -1; // Default for v4 (algo byte + rest)
+        this.publicKeyAlgorithm = readUInt8(this._getRelativeSubarray(currentRelativeOffset, currentRelativeOffset + 1)) as PublicKeyAlgorithm;
+        currentRelativeOffset += 1;
+
+        let publicKeyMaterialLength: number;
         if (this.keyVersion === 6) {
             const materialCount = readUInt32BE(this._getRelativeSubarray(currentRelativeOffset, currentRelativeOffset + 4));
             currentRelativeOffset += 4;
             publicKeyMaterialLength = materialCount; 
-            // The -1 for algo byte will be applied after reading the algo byte
+        } else {
+            // For v3/v4, the remaining data length is for the algorithm-specific parts
+            publicKeyMaterialLength = dataLength - currentRelativeOffset;
         }
-
-
-        this.publicKeyAlgorithm = readUInt8(this._getRelativeSubarray(currentRelativeOffset, currentRelativeOffset + 1)) as PublicKeyAlgorithm;
-        currentRelativeOffset += 1;
         
-        // Adjust remainingDataLength based on key version specifics
         const algorithmSpecificDataOffset = this._blobOffset + currentRelativeOffset;
-        let remainingDataLengthForAlgo = dataLength - currentRelativeOffset;
-        if (this.keyVersion === 6) {
-            remainingDataLengthForAlgo = publicKeyMaterialLength; // Use the explicit count for v6
-        }
+        const remainingDataLengthForAlgo = publicKeyMaterialLength;
 
 
         switch (this.publicKeyAlgorithm) {
@@ -113,24 +104,29 @@ export class PubKeyPacketData extends TBlob implements IPublicKeyPacketData {
                 break;
             default:
                 console.warn(`PubKeyPacketData: Unsupported public key algorithm ID: ${this.publicKeyAlgorithm}. Storing raw algorithm data.`);
-                this.algorithmData = this._getRelativeSubarray(currentRelativeOffset, currentRelativeOffset + remainingDataLengthForAlgo);
+                this.algorithmData = sliceUint8Array(this._kbx, algorithmSpecificDataOffset, algorithmSpecificDataOffset + remainingDataLengthForAlgo);
                 currentRelativeOffset += remainingDataLengthForAlgo;
                 break;
         }
+        
+        // For v6, the algorithm data length should match the declared material length.
+        // For v3/v4, the total currentRelativeOffset should match dataLength.
+        if (this.keyVersion === 6) {
+            // The `currentRelativeOffset` here is the offset *after* parsing algorithm data.
+            // The length of the algorithm data itself is `(this.algorithmData as any).totalLength` or `remainingDataLengthForAlgo` if it's raw.
+            let parsedAlgoDataLength = 0;
+            if (this.algorithmData instanceof Uint8Array) {
+                parsedAlgoDataLength = this.algorithmData.length;
+            } else if ((this.algorithmData as any).totalLength !== undefined) {
+                parsedAlgoDataLength = (this.algorithmData as any).totalLength;
+            }
 
-        if (currentRelativeOffset !== dataLength) {
-            // For v6, dataLength is the length of the whole PubKeyPacketData content.
-            // currentRelativeOffset is offset within that.
-            // The check should be if the read algo data length + initial fields equals dataLength (for v4/v3)
-            // or if read algo data length matches publicKeyMaterialLength (for v6)
-            if (this.keyVersion === 6) {
-                if ((this.algorithmData as any).totalLength !== remainingDataLengthForAlgo) {
-                     console.warn(`PubKeyPacketData (v6): Parsed algorithm data length (${(this.algorithmData as any).totalLength}) does not match declared material length (${remainingDataLengthForAlgo}).`);
-                }
-            } else { // v3/v4
-                 if (currentRelativeOffset !== dataLength) {
-                    console.warn(`PubKeyPacketData (v3/v4): Parsed packet content length (${currentRelativeOffset}) does not match declared data length for packet content (${dataLength}). There might be extra/unknown data.`);
-                }
+            if (parsedAlgoDataLength !== remainingDataLengthForAlgo) { // remainingDataLengthForAlgo is publicKeyMaterialLength for v6
+                 console.warn(`PubKeyPacketData (v6): Parsed algorithm data length (${parsedAlgoDataLength}) does not match declared material length (${remainingDataLengthForAlgo}).`);
+            }
+        } else { // v3/v4
+             if (currentRelativeOffset !== dataLength) {
+                console.warn(`PubKeyPacketData (v3/v4): Parsed packet content length (${currentRelativeOffset}) does not match declared data length for packet content (${dataLength}). There might be extra/unknown data.`);
             }
         }
     }

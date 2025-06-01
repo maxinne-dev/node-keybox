@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as fsPromises from 'node:fs/promises'; // Import the actual module
@@ -14,7 +15,7 @@ describe('ReadKeybox integration test', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Reset the mock for readFile before each test
-        (fsPromises.readFile as vi.Mock).mockReset();
+        vi.mocked(fsPromises.readFile).mockReset();
     });
 
     it('should parse a minimal Keybox file with FirstBlock and one OpenPGP DataBlob', async () => {
@@ -73,7 +74,7 @@ describe('ReadKeybox integration test', () => {
         const fullFileHex = firstBlockDataHex + dataBlobContentHex;
         const mockFileDataBytes = hexToUint8Array(fullFileHex);
         
-        (fsPromises.readFile as vi.Mock).mockResolvedValue(Buffer.from(mockFileDataBytes));
+        vi.mocked(fsPromises.readFile).mockResolvedValue(Buffer.from(mockFileDataBytes));
 
         const result = await ReadKeybox('dummy/path.kbx');
 

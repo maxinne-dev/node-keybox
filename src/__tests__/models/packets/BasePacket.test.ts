@@ -128,7 +128,7 @@ describe('BasePacket', () => {
             const data = hexToUint8Array('cbff00011170' + '00'.repeat(10)); // Shortened data for test speed
             const packet = new BasePacket(data, 0);
             expect(packet.tagInfo.packetType).toBe(PacketTypeEnum.LIT);
-            // Total length is 1 (tag) + 5 (length field) + 10 (actual data provided) due to truncation warning
+             // Total length is 1 (tag) + 5 (length field) + 10 (actual data provided) due to truncation warning
             expect(packet.totalPacketLength).toBe(1 + 5 + 10);
             expect(packet.dataOffsetInKbx).toBe(6);
             expect((packet.packetSpecificData as any).toJSON().type).toBe('MockedLiteralPacketData');
@@ -168,18 +168,18 @@ describe('BasePacket', () => {
             // Old format, type 0, indeterminate length (len type 3)
             // Tag: 10000011 = 0x83
             const data = hexToUint8Array('83' + '00'.repeat(5));
-            expect(() => new BasePacket(data, 0)).toThrow('BasePacket: Old format Indeterminate/Partial Length (type 3) encountered.');
+             expect(() => new BasePacket(data, 0)).toThrow('BasePacket: Old format Indeterminate/Partial Length (type 3) encountered.');
         });
     });
-
+    
     it('should correctly calculate dataOffsetInKbx', () => {
         const packetBytesHex = 'c60a' + '00'.repeat(10); // New, 1-octet length, total 12 bytes
         const keyboxData = hexToUint8Array('ff'.repeat(50) + packetBytesHex + 'ee'.repeat(10));
         const packetOffsetInKeybox = 50;
-
+        
         const packet = new BasePacket(keyboxData, packetOffsetInKeybox);
         // dataOffsetInKbx = packetOffsetInKeybox (50) + tagLen (1) + lengthFieldLen (1)
-        expect(packet.dataOffsetInKbx).toBe(packetOffsetInKeybox + 1 + 1);
+        expect(packet.dataOffsetInKbx).toBe(packetOffsetInKeybox + 1 + 1); 
     });
 
 
@@ -187,9 +187,9 @@ describe('BasePacket', () => {
         const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
         // New format, PUBKEY (type 6 -> 0xC6), declared length 20 (0x14)
         // But only 10 bytes of data are provided after header in the whole buffer
-        const data = hexToUint8Array('c614' + '00'.repeat(10));
+        const data = hexToUint8Array('c614' + '00'.repeat(10)); 
         const packet = new BasePacket(data, 0);
-
+        
         expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('exceeds available keybox data'));
         expect(packet['_declaredDataLength']).toBe(10); // Truncated
         expect(packet.totalPacketLength).toBe(1 + 1 + 10); // Adjusted total length
@@ -202,16 +202,16 @@ describe('BasePacket', () => {
         const rawPayload = '0102030405';
         const data = hexToUint8Array('de05' + rawPayload);
         const packet = new BasePacket(data, 0);
-
+        
         expect(consoleWarnSpy).toHaveBeenCalledWith('BasePacket: Unhandled packet type 30 (ID: 30). Storing raw data.');
         expect(packet.packetSpecificData).toBeInstanceOf(Uint8Array);
         expect(packet.packetSpecificData).toEqual(hexToUint8Array(rawPayload));
         consoleWarnSpy.mockRestore();
     });
-
+    
     it('should catch errors during specific packet data parsing and store raw data', () => {
         const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
+        
         literalPacketDataShouldThrow = true;
         literalPacketDataErrorMessage = "Mocked Literal Parse Error For This Test";
 
@@ -226,7 +226,7 @@ describe('BasePacket', () => {
         );
         expect(packet.packetSpecificData).toBeInstanceOf(Uint8Array);
         expect(packet.packetSpecificData).toEqual(hexToUint8Array(rawPayload));
-
+        
         consoleErrorSpy.mockRestore();
         // Reset flags (already in beforeEach, but good for clarity if this test was isolated)
         literalPacketDataShouldThrow = false;

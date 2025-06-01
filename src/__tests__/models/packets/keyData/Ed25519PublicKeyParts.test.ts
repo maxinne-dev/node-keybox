@@ -1,26 +1,53 @@
-import { describe, it, expect } from 'vitest';
+
+import { describe, it, expect, vi } from 'vitest';
 import { Ed25519PublicKeyParts } from '../../../../models/packets/keyData/Ed25519PublicKeyParts.js';
 import { hexToUint8Array } from '../../../test-utils.js';
+import { Buffer } from 'buffer';
 
 describe('Ed25519PublicKeyParts', () => {
-    const validKeyboxData = hexToUint8Array('00'.repeat(100) + '05'.repeat(32)); // 32 bytes public key
+    const keyboxData = new Uint8Array(100); // Dummy larger buffer
+    const expectedLength = 32;
 
-    it('should parse valid Ed25519 public key data', () => {
-        const instance = new Ed25519PublicKeyParts(validKeyboxData, 100, 32);
-        expect(instance.publicKey).toEqual(hexToUint8Array('05'.repeat(32)));
-        expect(instance.totalLength).toBe(32);
-    });
+    it('should parse a valid Ed25519 public key correctly', () => {
+        const publicKeyHex = 'AB'.repeat(expectedLength);
+        const publicKeyData = hexToUint8Array(publicKeyHex);
 
-    it('should throw if data length is less than expected', () => {
-        expect(() => new Ed25519PublicKeyParts(validKeyboxData, 100, 31)).toThrow(
-            'Ed25519PublicKeyParts: Data length (31) is less than expected 32 bytes.'
-        );
+        keyboxData.set(publicKeyData, 0);
+        const edParts = new Ed25519PublicKeyParts(keyboxData, 0, publicKeyData.length);
+
+        expect(edParts.publicKey).toEqual(publicKeyData);
+        expect(edParts.totalLength).toBe(expectedLength);
     });
 
     it('should produce correct JSON output', () => {
-        const instance = new Ed25519PublicKeyParts(validKeyboxData, 100, 32);
-        const json = instance.toJSON();
-        expect(json.publicKey_hex).toBe('05'.repeat(32));
-        expect(json.totalLength).toBe(32);
+        const publicKeyHex = 'CD'.repeat(expectedLength);
+        const publicKeyData = hexToUint8Array(publicKeyHex);
+        
+        keyboxData.set(publicKeyData, 0);
+        const edParts = new Ed25519PublicKeyParts(keyboxData, 0, publicKeyData.length);
+        const json = edParts.toJSON();
+
+        expect(json.publicKey_hex).toBe(publicKeyHex.toLowerCase());
+        expect(json.totalLength).toBe(expectedLength);
+    });
+
+    it('should throw if data length is less than expected', () => {
+        const shortKeyData = hexToUint8Array('00'.repeat(expectedLength - 1));
+        keyboxData.set(shortKeyData, 0);
+        
+        expect(() => new Ed25519PublicKeyParts(keyboxData, 0, shortKeyData.length))
+            .toThrow(`Ed25519PublicKeyParts: Data length (${expectedLength - 1}) is less than expected ${expectedLength} bytes.`);
+    });
+
+    it('should handle public key data at an offset', () => {
+        const publicKeyHex = '1A'.repeat(expectedLength);
+        const publicKeyData = hexToUint8Array(publicKeyHex);
+        const offset = 10;
+
+        keyboxData.set(publicKeyData, offset);
+        const edParts = new Ed25519PublicKeyParts(keyboxData, offset, publicKeyData.length);
+
+        expect(edParts.publicKey).toEqual(publicKeyData);
+        expect(edParts.totalLength).toBe(expectedLength);
     });
 });
