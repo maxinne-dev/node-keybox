@@ -13,3 +13,4 @@ yarn-error.log*
 /dist/
 /.idea/
 /test.js
+/coverage/

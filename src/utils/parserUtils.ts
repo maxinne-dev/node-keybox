@@ -1,4 +1,3 @@
-
 import { Buffer } from 'buffer'; // Ensure buffer is available, especially in browser environments if not polyfilled
 
 export function readUInt8(buffer: Uint8Array, offset: number = 0): number {
@@ -45,6 +44,9 @@ export function parseMPI(
     const bitLength = readUInt16BE(fullBuffer, absoluteOffset);
     const byteLength = Math.ceil(bitLength / 8);
     const totalBytesForMPI = 2 + byteLength;
+
+    console.debug(`parseMPI: rawData=${Buffer.from(fullBuffer.slice(absoluteOffset, absoluteOffset + 10)).toString('hex')}, bitLength=${bitLength}, byteLength=${byteLength}`);
+    console.debug(`parseMPI: bitLength=${bitLength}, byteLength=${byteLength}, totalBytesForMPI=${totalBytesForMPI}`);
 
     if (absoluteOffset + totalBytesForMPI > fullBuffer.length) {
         throw new Error(`parseMPI: Buffer too short to read MPI data. Need ${totalBytesForMPI}, have ${fullBuffer.length - absoluteOffset}.`);
