@@ -38,7 +38,7 @@ export class KeyInfo extends TBlob implements IKeyInfo {
         } else {
             throw new Error(`KeyInfo: Unsupported parent blob version: ${this._blobVersion}`);
         }
-        
+
         const flags = readUInt16BE(this.keyFlagsRaw);
         this.keyFlagsParsed = {
             qualifiedSignature: (flags & 0x0001) !== 0,
@@ -47,7 +47,7 @@ export class KeyInfo extends TBlob implements IKeyInfo {
             this.keyFlagsParsed.is32ByteFingerprintInUse = (flags & 0x0080) !== 0; // Bit 7
         }
     }
-    
+
     public toJSON() {
         const common = {
             actualSizeInBlob: this.actualSizeInBlob,
@@ -57,14 +57,14 @@ export class KeyInfo extends TBlob implements IKeyInfo {
         if (this._blobVersion === 1) {
             return {
                 ...common,
-                blobVersion: 1,
+                blobVersion: 1 as const,
                 fingerprintV1: this.fingerprintV1 ? Buffer.from(this.fingerprintV1).toString('hex') : undefined,
                 offsetKeyID: this.offsetKeyID,
             };
         } else {
             return {
                 ...common,
-                blobVersion: 2,
+                blobVersion: 2 as const,
                 fingerprintV2: this.fingerprintV2 ? Buffer.from(this.fingerprintV2).toString('hex') : undefined,
                 keygrip: this.keygrip ? Buffer.from(this.keygrip).toString('hex') : undefined,
             };
