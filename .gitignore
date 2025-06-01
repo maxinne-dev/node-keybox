@@ -9,3 +9,7 @@ yarn-error.log*
 .pnp.js
 
 .vscode/*
+/ignore/
+/dist/
+/.idea/
+/test.js
