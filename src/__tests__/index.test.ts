@@ -51,7 +51,7 @@ describe('ReadKeybox integration test', () => {
         const packetDataHex = 'ca03504750'; // 5 bytes long
         
         // Checksum (20 bytes)
-        const checksumHex = 'aa'.repeat(CHECKSUM_SIZE); // Use a non-zero checksum for clarity
+        const checksumHex = '842a34ff88e8cf04020c74d13282c9d9b02e9e08';
 
         // Data blob layout:
         // KeyBlockHeader (20 bytes)
