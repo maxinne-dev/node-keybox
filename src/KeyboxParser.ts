@@ -120,7 +120,7 @@ export class KeyboxParser {
         
         // 10. Read and Verify Checksum
         const checksumOffset = dataBlobOffsetStart + keyBlockHeader.blobLength - CHECKSUM_SIZE;
-        let checksum = new Uint8Array(0);
+        let checksum: Uint8Array = new Uint8Array(0);
         let isChecksumValid: boolean | undefined = undefined;
 
         if (keyBlockHeader.blobLength >= CHECKSUM_SIZE && 
